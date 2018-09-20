@@ -49,37 +49,88 @@ def Think(field):
 def GetScore(field, position):
     o_stones = []
     o_stones.append(CountStonesInDirection(field, position, (1, 1), 'O'))
+    o_stones.append(CountStonesInDirection(field, position, (-1, -1), 'O'))
+
     o_stones.append(CountStonesInDirection(field, position, (1, 0), 'O'))
+    o_stones.append(CountStonesInDirection(field, position, (-1, 0), 'O'))
+
     o_stones.append(CountStonesInDirection(field, position, (1, -1), 'O'))
+    o_stones.append(CountStonesInDirection(field, position, (-1, 1), 'O'))
+
     o_stones.append(CountStonesInDirection(field, position, (0, 1), 'O'))
+    o_stones.append(CountStonesInDirection(field, position, (0, -1), 'O'))
+
     o_stones = sorted(o_stones, reverse=True)
+
+
     x_stones = []
     x_stones.append(CountStonesInDirection(field, position, (1, 1), 'X'))
+    x_stones.append(CountStonesInDirection(field, position, (-1, -1), 'X'))
+
+    # DebugPrint((x_stones))
+
     x_stones.append(CountStonesInDirection(field, position, (1, 0), 'X'))
+    x_stones.append(CountStonesInDirection(field, position, (-1, 0), 'X'))
+
+    # DebugPrint((x_stones))
+
     x_stones.append(CountStonesInDirection(field, position, (1, -1), 'X'))
+    x_stones.append(CountStonesInDirection(field, position, (-1, 1), 'X'))
+
+    # DebugPrint((x_stones))
+
     x_stones.append(CountStonesInDirection(field, position, (0, 1), 'X'))
+    x_stones.append(CountStonesInDirection(field, position, (0, -1), 'X'))
+
+
     x_stones = sorted(x_stones, reverse=True)
     # DebugPrint('position = (%d,%d)' % (position[0],position[1]))
-    #
-    # DebugPrint(  (o_stones))
+    # DebugPrint((o_stones))
+    # DebugPrint((x_stones))
 
 
     EnemyValue=0
     MyValue=0
 
-    if x_stones[0] == 5:
+    if o_stones[0] >= 5:
         return 0
-    if x_stones[0] == 4:
-        return 2
+
+    if x_stones[0] >= 5:
+        return 0
     #禁じ手
-    if x_stones[0] == 4 and x_stones[1] == 4:
-        return 2
+    if x_stones[0] >= 4 and x_stones[1] >= 4:
+        return 1
     #禁じ手
-    if x_stones[0] == 3 and x_stones[1] == 3:
+    if x_stones[0] >= 4 and x_stones[1] >= 3:
+        return 1
+
+    #禁じ手
+    if x_stones[0] >= 3 and x_stones[1] >= 3:
         return 2
 
-    if x_stones[0] == 3:
+
+    #禁じ手
+    if o_stones[0] >= 4 and o_stones[1]>=4:
+        return 1
+    #禁じ手
+    if o_stones[0] >= 3 and o_stones[1] >= 3:
+        return 3
+    #禁じ手
+
+    if x_stones[0] >= 4:
         return 4
+    if o_stones[0] >= 4:
+        return 5
+
+
+    if x_stones[0] >= 3:
+        return 4
+    if x_stones[0] >= 2 and x_stones[1]>=2:
+        return 5
+    if x_stones[0] >= 3:
+        return 8
+    if x_stones[0] >= 2:
+        return 10
 
 
 
@@ -93,27 +144,17 @@ def GetScore(field, position):
     # if x_stones[0] == 2:
     #     Enemyvalue = 11
 
-    if o_stones[0] == 5:
-        return 0
-    #禁じ手
-    if o_stones[0] == 4:
-        return 2
-    #禁じ手
-    if o_stones[0] == 4 and o_stones[1]==4:
-        return 1
-    #禁じ手
-    if o_stones[0] == 3 and o_stones[1] == 3:
-        return 3
-    if o_stones[0] == 3:
-        return 4
+
+    if o_stones[0] >= 3:
+        return 8
+    if o_stones[0] >= 2:
+        return 10
 
     # if o_stones[0] == 3 and o_stones[1] == 2:
     #     MyValue= 6
     #
     # if o_stones[0] == 3:
     #     MyValue= 8
-    if o_stones[0] == 2:
-        return 10
     # if o_stones[0] == 2:
     #     MyValue= 11
 
@@ -151,7 +192,7 @@ def CountLivingStonesInDirection(field,position,diff,stone):
 
 def CountStonesInDirection(field, position, diff, stone):
   field[position[0]][position[1]] = stone
-  max_count = 0
+  max_count = [0,0,0]
   for start in range(5):
     row = position[0] - start * diff[0]
     col = position[1] - start * diff[1]
@@ -165,14 +206,19 @@ def CountStonesInDirection(field, position, diff, stone):
       if field[row][col] == stone:
         count += 1
       elif field[row][col] == '.':
+        #if count > 1:
+            #DebugPrint((count))
         count = 0
       row += diff[0]
       col += diff[1]
       i += 1
-    if i == 5 and count > max_count:
-      max_count = count
+    if i == 5 :
+      max_count.append(count)
   field[position[0]][position[1]] = '.'
-  return max_count
+  max_count = sorted(max_count, reverse=True)
+
+  ret_value=max_count[0]
+  return ret_value
 
 # Outputs |msg| to stderr; This is actually a thin wrapper of print().
 def DebugPrint(msg):
